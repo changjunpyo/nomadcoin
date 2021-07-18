@@ -7,6 +7,12 @@ import (
 	"net/http"
 	"text/template"
 )
+
+type HomeData struct {
+	PageTitle string
+	Blocks    []*blockchain.Block
+}
+
 const (
 	port        string = ":4000"
 	templateDir string = "explorer/templates/"
@@ -15,7 +21,7 @@ const (
 var templates *template.Template
 
 func home(w http.ResponseWriter, r *http.Request) {
-	page := blockchain.HomeData{"Home", blockchain.GetBlockChain().AllBlocks()}
+	page := HomeData{"Home", nil}
 	templates.ExecuteTemplate(w, "home", page)
 }
 
@@ -26,7 +32,7 @@ func add(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		r.ParseForm()
 		data := r.Form.Get("blockData")
-		blockchain.GetBlockChain().AddBlock(data)
+		blockchain.BlockChain().AddBlock(data)
 		http.Redirect(w, r, "/", http.StatusPermanentRedirect)
 	}
 }
