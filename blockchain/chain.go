@@ -1,7 +1,6 @@
 package blockchain
 
 import (
-	"fmt"
 	"github.com/changjunpyo/nomadcoin/db"
 	"github.com/changjunpyo/nomadcoin/utils"
 	"sync"
@@ -20,7 +19,7 @@ func (b *blockchain) restore(data []byte) {
 }
 
 func (b *blockchain) persist() {
-	db.SaveBlockchain(utils.ToBytes(b))
+	db.SaveCheckPoint(utils.ToBytes(b))
 }
 
 func (b *blockchain) AddBlock(data string) {
@@ -49,16 +48,13 @@ func BlockChain() *blockchain {
 	if b == nil {
 		once.Do(func() {
 			b = &blockchain{"", 0}
-			fmt.Printf("NewestHash: %s\nHeight:%d\n", b.NewestHash, b.Height)
 			checkpoint := db.CheckPoint()
 			if checkpoint == nil {
 				b.AddBlock("Genesis")
 			} else {
-				fmt.Println("Restoring...")
 				b.restore(checkpoint)
 			}
 		})
-		fmt.Printf("NewestHash: %s\nHeight:%d", b.NewestHash, b.Height)
 	}
 	return b
 }
